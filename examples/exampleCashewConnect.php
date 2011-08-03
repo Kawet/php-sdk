@@ -19,17 +19,19 @@ require '../src/CashewWrapper.php';
 
 define('API_KEY', '');	// Your API key
 define('API_SECRET', ''); // Your API secret
-define('USERNAME', ''); // Your username
-define('PASSWORD', ''); // Your password
+define('URL_CALLBACK', ''); // The url of the exempleCashewConnect.php file on your server
+
+if(!isset($_GET['request_token'])) {
+	$url = CASHEW_HTTPS_CONNECT.API_KEY.'/'.strtr(rtrim(base64_encode(URL_CALLBACK), '='), '+/', '-_');
+	echo '<h2>Please login to <a href="'.$url.'">Cashew</a></h2>';
+	exit(0);
+}
 
 // Instantiate the wrapper with your API key, API secret and the request token
-$wrapper = new CashewWrapper(API_KEY, API_SECRET); 
+$wrapper = new CashewWrapper(API_KEY, API_SECRET, $_GET['request_token']); 
 
 // You can enable logs if necessary
 //$wrapper->enableLogs();
-
-// Login with your Cashew username and password
-$wrapper->login(USERNAME, PASSWORD);
 
 
 // App parameters
@@ -132,5 +134,5 @@ $wrapper->sendRequest(CASHEW_API_URL.'designs/uploadBackground', $backgroundPara
 $credentials = $wrapper->sendRequest(CASHEW_API_URL.'apps/getCredentials', array('app_id' => $app->app_id), 'GET');
 
 if($credentials->login)
-	echo '<b>'.$appParameters['title'].'</b> created<br><br>login : '.$credentials->login.' / password : '.$credentials->pass;
+	echo "<b>".$appParameters['title']."</b> created<br><br>login : $credentials->login / password : $credentials->pass";
 ?>

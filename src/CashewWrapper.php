@@ -16,6 +16,7 @@
  */
 
 define('CASHEW_API_URL', 'http://api.cashew.dev.madebykawet.com/api/');
+define('CASHEW_API_HTTPS_URL', 'https://api.cashew.dev.madebykawet.com/api/');
 define('CASHEW_HTTPS_CONNECT', 'https://api.cashew.dev.madebykawet.com/connect/');
 
 if (!function_exists('curl_init'))
@@ -26,26 +27,36 @@ if (!function_exists('json_decode'))
 
 Class CashewWrapper
 {
-	public $_apiKey;
-	public $_apiSecret;
-	public $_accessToken;
-	private $_ch;
-	public $_format;
-	public $_logs;
+	private   $_ch;
+	protected $_accessToken = false;
+	protected $_apiKey;
+	protected $_apiSecret;
+	protected $_appId = false;
+	protected $_logs = false;
 	
-	function __construct($apiKey, $secret, $requestToken, $logs = false)
+	function __construct($apiKey, $secret, $requestToken = false)
 	{
 		$this->_apiKey = $apiKey;
 		$this->_apiSecret = $secret;
 		$this->_ch = curl_init();
-		$this->_format = 'json';
-		$this->_accessToken = false;
-		$this->_appId = false;
-		$this->_logs = $logs;
+		$requestToken && $this->getAccessToken($requestToken);
+	}
+	
+	function enableLogs()
+	{
+		$this->_logs = true;
+	}
+	
+	function getAccessToken($requestToken)
+	{
 		$params['request_token'] = $requestToken;
 		$result = $this->sendRequest(CASHEW_API_URL.'auth/getAccessToken', $params, 'GET');
 		if(isset($result->access_token))
+		{
 			$this->_accessToken = $result->access_token;
+			return true;
+		}
+		return false;
 	}
 	
 	function setAppId($appId)
@@ -53,14 +64,20 @@ Class CashewWrapper
 		$this->_appId = $appId;
 	}
 	
-	function sendRequest($url, $params = array(), $method = false)
+	function login($username, $password)
+	{
+		$params = array('username' => $username, 'password' => $password);
+		$result = $this->sendRequest(CASHEW_API_HTTPS_URL.'auth/login', $params);
+		if(isset($result->request_token) && isset($result->user_id) && $this->getAccessToken($result->request_token))
+			return $result->user_id;
+		return false;
+	}
+	
+	function sendRequest($url, $params = array(), $method = 'POST')
 	{
 		$params['API-Key'] = $this->_apiKey;
-		$params['format'] = $this->_format;
-		if ($this->_appId)
-			$params['app_id'] = $this->_appId;
-		if ($this->_accessToken)
-			$params['token'] = $this->_accessToken;
+		$this->_appId && $params['app_id'] = $this->_appId;
+		$this->_accessToken && $params['token'] = $this->_accessToken;
 		$params['api_sig'] = $this->apiSign($params);
 		if (strtoupper($method) == 'POST')
 		{
@@ -83,12 +100,18 @@ Class CashewWrapper
 			curl_setopt($this->_ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, false);
 		}
+		if($this->_logs)
+			echo 'url => '.$url.'<br>params => '.var_export($params, true);
 		$return  = curl_exec($this->_ch);
 		$result = json_decode($return);
-		if($this->_logs && $result->error) {
-			echo 'url => '.$url.'<br>params => ';
-			var_dump($params);
-			echo '<br>error => '.$result->error.'<br><br>';
+		if($result == NULL)
+			$result = $return;
+		if($this->_logs) {
+			if(isset($result->error))
+				$log = '<br>error => '.$result->error;
+			else
+				$log = '<br>result => '.var_export($result, true);
+			echo $log.'<br><br>';
 		}
         return $result;
 	}
@@ -100,9 +123,10 @@ Class CashewWrapper
 		$toEncode = '';
 		ksort($params);
 		foreach ($params as $k => $v)
-			$toEncode .= $k.$v;
+			if($k != 'Filedata')
+				$toEncode .= $k.$v;
 		$toEncode .= $this->_apiSecret;
-		return md5($toEncode);
+		return sha1($toEncode);
 	}
 }
 ?>
