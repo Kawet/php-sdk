@@ -47,23 +47,21 @@ $wrapper->setAppId($app->app_id);
 // First tab parameters
 $firstTabParameters = array(
 	'title' => 'Home',
-	'icon_id' => 217, // an integer between 165 & 314
-	'type' => 'Details'
+	'icon_id' => 217 // an integer between 165 & 314
 );
 
 // Create first tab
-$firstTab = $wrapper->sendRequest(CASHEW_API_URL.'tabs/create', $firstTabParameters);
+$firstTab = $wrapper->sendRequest(CASHEW_API_URL.'tabs/createView', $firstTabParameters);
 
 
 // Header item parameters
 $headerParameters = array(
 	'parent_id' => $firstTab->tab_id,
-	'title' => 'A title !',
-	'type' => 'Header'
+	'title' => 'A title !'
 );
 
 // Create header item
-$wrapper->sendRequest(CASHEW_API_URL.'items/create', $headerParameters);
+$wrapper->sendRequest(CASHEW_API_URL.'items/createTitle', $headerParameters);
 
 
 // Picture parameters
@@ -78,36 +76,33 @@ $picture = $wrapper->sendRequest(CASHEW_API_URL.'pictures/file', $pictureParamet
 // Picture item parameters
 $pictureItemParameters = array(
 	'parent_id' => $firstTab->tab_id,
-	'type' => 'Picture',
 	'picture_id' => $picture->picture_id
 );
 
 // Create picture item
-$wrapper->sendRequest(CASHEW_API_URL.'items/create', $pictureItemParameters);
+$wrapper->sendRequest(CASHEW_API_URL.'items/createPicture', $pictureItemParameters);
 
 
 // Text item parameters
 $textItemParameters = array(
 	'parent_id' => $firstTab->tab_id,
-	'type' => 'Text',
 	'details' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor '.
 				 'incididunt ut labore et dolore magna aliqua.'
 );
 
 // Create text item
-$wrapper->sendRequest(CASHEW_API_URL.'items/create', $textItemParameters);
+$wrapper->sendRequest(CASHEW_API_URL.'items/createText', $textItemParameters);
 
 
 // Second tab parameters
 $secondTabParameters = array(
 	'title' => 'Twitter',
 	'icon_id' => 187,
-	'type' => 'Twitter',
 	'twitter_search' => 'madebykawet'
 );
 
 // Create second tab
-$secondTab = $wrapper->sendRequest(CASHEW_API_URL.'tabs/create', $secondTabParameters);
+$secondTab = $wrapper->sendRequest(CASHEW_API_URL.'tabs/createTwitter', $secondTabParameters);
 
 
 // Icon parameters
@@ -117,15 +112,6 @@ $iconParameters = array(
 
 // Upload icon image
 $wrapper->sendRequest(CASHEW_API_URL.'designs/uploadIcon', $iconParameters);
-
-
-// Background parameters
-$backgroundParameters = array(
-	'Filedata' => '@./images/body.png'
-);
-
-// Upload background image
-$wrapper->sendRequest(CASHEW_API_URL.'designs/uploadBackground', $backgroundParameters);
 
 
 // Get app credentials

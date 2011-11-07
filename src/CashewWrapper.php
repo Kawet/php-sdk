@@ -32,7 +32,7 @@ Class CashewWrapper
 	protected $_apiKey;
 	protected $_apiSecret;
 	protected $_appId = false;
-	protected $_logs = false;
+	protected $_logs = true;
 	
 	function __construct($apiKey, $secret, $requestToken = false)
 	{
@@ -81,6 +81,9 @@ Class CashewWrapper
 		$params['api_sig'] = $this->apiSign($params);
 		if (strtoupper($method) == 'POST')
 		{
+			$useragent="Cashew API Wrapper (PHP)";
+
+			curl_setopt($this->_ch, CURLOPT_USERAGENT, $useragent);
 			curl_setopt($this->_ch, CURLOPT_POST, 1);
 			curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $params);
 		}
@@ -108,7 +111,7 @@ Class CashewWrapper
 			$result = $return;
 		if($this->_logs) {
 			if(isset($result->error))
-				$log = '<br>error => '.$result->error;
+				$log = '<br><b>error => '.$result->error.'</b>';
 			else
 				$log = '<br>result => '.var_export($result, true);
 			echo $log.'<br><br>';
@@ -126,7 +129,7 @@ Class CashewWrapper
 			if($k != 'Filedata')
 				$toEncode .= $k.$v;
 		$toEncode .= $this->_apiSecret;
-		return sha1($toEncode);
+		return sha1(htmlentities(str_replace(array("\r\n", "\n", "\r"), '', $toEncode)));
 	}
 }
 ?>
