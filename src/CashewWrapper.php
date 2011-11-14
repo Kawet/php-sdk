@@ -15,9 +15,9 @@
  * under the License.
  */
 
-define('CASHEW_API_URL', 'http://api.cashew.dev.madebykawet.com/api/');
-define('CASHEW_API_HTTPS_URL', 'https://api.cashew.dev.madebykawet.com/api/');
-define('CASHEW_HTTPS_CONNECT', 'https://api.cashew.dev.madebykawet.com/connect/');
+define('CASHEW_API_URL', 'http://cashew.madebykawet.com/api/');
+define('CASHEW_API_HTTPS_URL', 'https://cashew.madebykawet.com/api/');
+define('CASHEW_HTTPS_CONNECT', 'https://cashew.madebykawet.com/connect/');
 
 if (!function_exists('curl_init'))
 	throw new Exception('Cashew API needs the CURL PHP extension.');
