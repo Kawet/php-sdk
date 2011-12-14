@@ -1,4 +1,4 @@
-If you would like to try the Cashew API, send us a request at api@madebykawet.com, we will give you an API key and an API secret to use the API.
+If you would like to try the Cashew API, create an account on http://cashew.madebykawet.com/, then click the API Settings icon : it will give you an API key and an API secret to use the API.
 
 
 PURPOSE

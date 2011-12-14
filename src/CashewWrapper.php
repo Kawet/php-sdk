@@ -32,7 +32,7 @@ Class CashewWrapper
 	protected $_apiKey;
 	protected $_apiSecret;
 	protected $_appId = false;
-	protected $_logs = true;
+	protected $_logs = false;
 	
 	function __construct($apiKey, $secret, $requestToken = false)
 	{
