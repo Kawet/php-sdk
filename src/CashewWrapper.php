@@ -32,7 +32,7 @@ Class CashewWrapper
 	protected $_apiKey;
 	protected $_apiSecret;
 	protected $_appId = false;
-	protected $_logs = false;
+	protected $_logs = true;
 	
 	function __construct($apiKey, $secret, $requestToken = false)
 	{
@@ -78,6 +78,9 @@ Class CashewWrapper
 		$params['API-Key'] = $this->_apiKey;
 		$this->_appId && $params['app_id'] = $this->_appId;
 		$this->_accessToken && $params['token'] = $this->_accessToken;
+		foreach($params as $key => $value)
+			if($key != 'Filedata')
+				$params[$key] = rawurlencode($value);
 		$params['api_sig'] = $this->apiSign($params);
 		if (strtoupper($method) == 'POST')
 		{
@@ -104,7 +107,7 @@ Class CashewWrapper
 			curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, false);
 		}
 		if($this->_logs)
-			echo 'url => '.$url.'<br>params => '.var_export($params, true);
+			echo 'url => '.$url.'<br>params => '.json_encode($params);
 		$return  = curl_exec($this->_ch);
 		$result = json_decode($return);
 		if($result == NULL)
@@ -113,23 +116,21 @@ Class CashewWrapper
 			if(isset($result->error))
 				$log = '<br><b>error => '.$result->error.'</b>';
 			else
-				$log = '<br>result => '.var_export($result, true);
+				$log = '<br>result => '.json_encode($result);
 			echo $log.'<br><br>';
 		}
         return $result;
 	}
 	
-	private function apiSign($params = array())
+	private function apiSign($params)
 	{
-		if (!count($params))
-			return '';
 		$toEncode = '';
 		ksort($params);
-		foreach ($params as $k => $v)
-			if($k != 'Filedata')
-				$toEncode .= $k.$v;
+		foreach ($params as $key => $value)
+			if($key != 'Filedata')
+				$toEncode .= $key.$value;
 		$toEncode .= $this->_apiSecret;
-		return sha1(htmlentities(str_replace(array("\r\n", "\n", "\r"), '', $toEncode)));
+		return sha1($toEncode);
 	}
 }
 ?>

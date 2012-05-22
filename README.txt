@@ -15,4 +15,4 @@ EXECUTION
 
 Simply run one of the example files in a browser.
 
-You can now build any app you like, based on example.php and on the API documentation that can be found here : http://cashew.madebykawet.com/api_documentation.
+You can now build any app you like, based on example.php and on the API documentation that can be found here : http://cashew.madebykawet.com/api/documentation.
